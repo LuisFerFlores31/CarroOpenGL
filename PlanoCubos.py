@@ -37,6 +37,9 @@ CENTER_Z = 0
 UP_X=0
 UP_Y=1
 UP_Z=0
+# Variable para el ángulo de las ruedas
+wheel_angle = 0.0
+
 #Variables para dibujar los ejes del sistema
 X_MIN=-500
 X_MAX=500
@@ -139,19 +142,26 @@ def displayChasis():
     
 def displayLlantas_tr():
     glPushMatrix()
-    # Mover y rotar el carrito según controles
+    # Mover y rotar el carrito
     glTranslatef(Player_X, Player_Y, Player_Z)
     glRotatef(car_angle, 0.0, 1.0, 0.0)
     # Corrección para dibujar el objeto en plano XZ
     glRotatef(-90.0, 1.0, 0.0, 0.0)
     glTranslatef(0.0, 0.0, 15.0)
+    
+    # Llantas traseras: giran sobre su propio eje X (no afectan el eje del carro)
+    glPushMatrix()
+    # Ajusta la posición local de las llantas traseras si es necesario
+    glRotatef(wheel_angle, 1.0, 0.0, 0.0)
+    
     glScale(10.0,10.0,10.0)
     objetos[1].render()
+    glPopMatrix()
     glPopMatrix()
     
 def displayLlantas_ad():
     glPushMatrix()
-    # Mover y rotar el carrito según controles
+    # Mover y rotar las llantas según controles
     glTranslatef(Player_X, Player_Y, Player_Z)
     glRotatef(car_angle, 0.0, 1.0, 0.0)
     # Corrección para dibujar el objeto en plano XZ
@@ -218,9 +228,15 @@ while not done:
     if keys[pygame.K_s]:
         Player_X += dir_x * move_speed
         Player_Z += dir_z * move_speed
+        wheel_angle -= 5.0  # Incrementa el ángulo de las ruedas al retroceder
+        if wheel_angle <= -360.0:
+            wheel_angle += 360.0
     if keys[pygame.K_w]:
         Player_X -= dir_x * move_speed
         Player_Z -= dir_z * move_speed
+        wheel_angle += 5.0  # Incrementa el ángulo de las ruedas al avanzar
+        if wheel_angle >= 360.0:
+            wheel_angle -= 360.0
     if keys[pygame.K_a]:
         car_angle += turn_speed
     if keys[pygame.K_d]:

@@ -83,7 +83,7 @@ def Axis():
 def Init():
     screen = pygame.display.set_mode(
         (screen_width, screen_height), DOUBLEBUF | OPENGL)
-    pygame.display.set_caption("OpenGL: cubos")
+    pygame.display.set_caption("OpenGL: Carro")
 
     glMatrixMode(GL_PROJECTION)
     glLoadIdentity()
@@ -103,9 +103,12 @@ def Init():
     glEnable(GL_LIGHTING)
     glEnable(GL_LIGHT0)
     glEnable(GL_COLOR_MATERIAL)
-    glShadeModel(GL_SMOOTH)           # most obj files expect to be smooth-shaded    
-    #objetos.append(OBJ("Ejemplo11_objetos/Tank.obj", swapyz=True))    
-    objetos.append(OBJ("Chevrolet_Camaro_SS_Low.obj", swapyz=True))
+    glShadeModel(GL_SMOOTH)           # most obj files expect to be smooth-shaded       
+    #objetos.append(OBJ("Chevrolet_Camaro_SS_Low.obj", swapyz=True))
+    objetos.append(OBJ("Chasis.obj", swapyz=True))
+    objetos.append(OBJ("Llantas_tr.obj", swapyz=True))
+    objetos.append(OBJ("Llantas_ad.obj", swapyz=True))
+    
     
 
     for i in range(len(objetos)): 
@@ -121,7 +124,8 @@ def lookat():
     glLoadIdentity()
     gluLookAt(EYE_X,EYE_Y,EYE_Z,CENTER_X,CENTER_Y,CENTER_Z,UP_X,UP_Y,UP_Z)
     
-def displayobj():
+#Maquinas de dibujar
+def displayChasis():
     glPushMatrix()
     # Mover y rotar el carrito según controles
     glTranslatef(Player_X, Player_Y, Player_Z)
@@ -131,6 +135,30 @@ def displayobj():
     glTranslatef(0.0, 0.0, 15.0)
     glScale(10.0,10.0,10.0)
     objetos[0].render()
+    glPopMatrix()
+    
+def displayLlantas_tr():
+    glPushMatrix()
+    # Mover y rotar el carrito según controles
+    glTranslatef(Player_X, Player_Y, Player_Z)
+    glRotatef(car_angle, 0.0, 1.0, 0.0)
+    # Corrección para dibujar el objeto en plano XZ
+    glRotatef(-90.0, 1.0, 0.0, 0.0)
+    glTranslatef(0.0, 0.0, 15.0)
+    glScale(10.0,10.0,10.0)
+    objetos[1].render()
+    glPopMatrix()
+    
+def displayLlantas_ad():
+    glPushMatrix()
+    # Mover y rotar el carrito según controles
+    glTranslatef(Player_X, Player_Y, Player_Z)
+    glRotatef(car_angle, 0.0, 1.0, 0.0)
+    # Corrección para dibujar el objeto en plano XZ
+    glRotatef(-90.0, 1.0, 0.0, 0.0)
+    glTranslatef(0.0, 0.0, 15.0)
+    glScale(10.0,10.0,10.0)
+    objetos[2].render()
     glPopMatrix()
     
 def display():
@@ -144,8 +172,13 @@ def display():
     glVertex3d(DimBoard, 0, DimBoard)
     glVertex3d(DimBoard, 0, -DimBoard)
     glEnd()
-        
-    displayobj()
+    
+    #Se dibuja el Chasis
+    displayChasis()
+    
+    #Se dibujan las llantas
+    displayLlantas_tr()
+    displayLlantas_ad()
     
 done = False
 Init()

@@ -1,6 +1,6 @@
 # Blender 4.5.3 LTS
 # www.blender.org
-mtllib Llantas.mtl
+mtllib Llantas_ad.mtl
 o Rin_1_Ad_Plano.017
 v 1.888963 -1.150321 3.103320
 v 1.878630 -0.818048 3.183272

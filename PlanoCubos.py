@@ -15,8 +15,8 @@ sys.path.append('..')
 # Import obj loader
 from objloader import *
 
-screen_width = 800
-screen_height = 600
+screen_width = 1200
+screen_height = 800
 #vc para el obser.
 FOVY=60.0
 ZNEAR=0.01
@@ -26,9 +26,11 @@ ZFAR=900.0
 EYE_X = 300.0
 EYE_Y = 200.0
 EYE_Z = 300.0
-Player_X = 0
-Player_Y = 0
-Player_Z = 0
+Player_X = 0.0
+Player_Y = 0.0
+Player_Z = 0.0
+# Ángulo de rotación del carrito
+car_angle = 0.0
 CENTER_X = 0
 CENTER_Y = 0
 CENTER_Z = 0
@@ -120,13 +122,15 @@ def lookat():
     gluLookAt(EYE_X,EYE_Y,EYE_Z,CENTER_X,CENTER_Y,CENTER_Z,UP_X,UP_Y,UP_Z)
     
 def displayobj():
-    glPushMatrix()  
-    #correcciones para dibujar el objeto en plano XZ
-    #esto depende de cada objeto
+    glPushMatrix()
+    # Mover y rotar el carrito según controles
+    glTranslatef(Player_X, Player_Y, Player_Z)
+    glRotatef(car_angle, 0.0, 1.0, 0.0)
+    # Corrección para dibujar el objeto en plano XZ
     glRotatef(-90.0, 1.0, 0.0, 0.0)
     glTranslatef(0.0, 0.0, 15.0)
     glScale(10.0,10.0,10.0)
-    objetos[0].render()  
+    objetos[0].render()
     glPopMatrix()
     
 def display():
@@ -145,43 +149,56 @@ def display():
     
 done = False
 Init()
+move_speed = 1.0
+turn_speed = 1.0
 while not done:
     keys = pygame.key.get_pressed()
-    #avanzar observador
+    # Controles observador (flechas)
     if keys[pygame.K_RIGHT]:
         if theta > 359.0:
             theta = 0
         else:
             theta += 1.0
-        lookat()        
+        lookat()
     if keys[pygame.K_LEFT]:
         if theta < 1.0:
             theta = 360.0
         else:
             theta += -1.0
-        lookat()      
+        lookat()
         
-    #Controles Carro
-    move_speed = 2.0
-    turn_speed = 2.0
+    if keys[pygame.K_UP]:
+        if radius > 1.0:
+            radius += -1.0
+        lookat()
+        
+    if keys[pygame.K_DOWN]:
+        if radius < 900.0:
+            radius += 1.0
+        lookat()
+
+    # Controles Carro (WASD)
+    # Calcular dirección actual del carrito
+    rad = math.radians(car_angle)
+    dir_x = math.sin(rad)
+    dir_z = math.cos(rad)
     if keys[pygame.K_s]:
-        Player_X += dir[0] * move_speed
-        Player_Z += dir[2] * move_speed
-    if keys[pygame.K_s]:
-        Player_X -= dir[0] * move_speed
-        Player_Z -= dir[2] * move_speed
-    if keys[pygame.K_r]:
-        theta += turn_speed
-    if keys[pygame.K_l]:
-        theta -= turn_speed 
-    
+        Player_X += dir_x * move_speed
+        Player_Z += dir_z * move_speed
+    if keys[pygame.K_w]:
+        Player_X -= dir_x * move_speed
+        Player_Z -= dir_z * move_speed
+    if keys[pygame.K_a]:
+        car_angle += turn_speed
+    if keys[pygame.K_d]:
+        car_angle -= turn_speed
+
     for event in pygame.event.get():
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
                 done = True
 
     display()
-
     pygame.display.flip()
     pygame.time.wait(10)
 

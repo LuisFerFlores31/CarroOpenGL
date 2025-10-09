@@ -39,6 +39,7 @@ UP_Y=1
 UP_Z=0
 # Variable para el ángulo de las ruedas
 wheel_angle = 0.0
+wheel_rotate = 0.0
 
 #Variables para dibujar los ejes del sistema
 X_MIN=-500
@@ -106,11 +107,14 @@ def Init():
     glEnable(GL_LIGHTING)
     glEnable(GL_LIGHT0)
     glEnable(GL_COLOR_MATERIAL)
-    glShadeModel(GL_SMOOTH)           # most obj files expect to be smooth-shaded       
+    glShadeModel(GL_SMOOTH)
     #objetos.append(OBJ("Chevrolet_Camaro_SS_Low.obj", swapyz=True))
-    objetos.append(OBJ("Chasis.obj", swapyz=True))
+    objetos.append(OBJ("Chasis90.obj", swapyz=True))
     objetos.append(OBJ("Llantas_tr.obj", swapyz=True))
     objetos.append(OBJ("Llantas_ad.obj", swapyz=True))
+    #objetos.append(OBJ("Llanta_ad_iz.obj", swapyz=True))
+    #objetos.append(OBJ("Llanta_ad_de.obj", swapyz=True))
+
     
     
 
@@ -134,8 +138,8 @@ def displayChasis():
     glTranslatef(Player_X, Player_Y, Player_Z)
     glRotatef(car_angle, 0.0, 1.0, 0.0)
     # Corrección para dibujar el objeto en plano XZ
-    glRotatef(-90.0, 1.0, 0.0, 0.0)
-    glTranslatef(0.0, 0.0, 15.0)
+    #glRotatef(-90.0, 1.0, 0.0, 0.0) #Rotar el chasis para que quede en plano XZ (Solo necesario para el chasis original)
+    glTranslatef(0.0, 15.0, 0.0) #Ajusta la altura del chasis
     glScale(10.0,10.0,10.0)
     objetos[0].render()
     glPopMatrix()
@@ -169,6 +173,7 @@ def displayLlantas_ad():
  # Trasladar al eje de las llantas traseras (ajusta Z si es necesario)
     glTranslatef(0.0, 3.2, -0.68)  # Ajusta este valor según el centro de las llantas en tu modelo
     glRotatef(wheel_angle, 1.0, 0.0, 0.0)
+    glRotatef(1.0, wheel_rotate, 0.0, 0.0)  # Ajusta este valor para girar las llantas delanteras al girar el carro
     glTranslatef(0.0, -3.2, 0.68)   # Regresa al origen
     objetos[2].render()
     glPopMatrix()
@@ -241,8 +246,12 @@ while not done:
             wheel_angle -= 360.0
     if keys[pygame.K_a]:
         car_angle += turn_speed
+        wheel_rotate = 15.0  # Ajusta este valor para el ángulo de giro de las ruedas delanteras
     if keys[pygame.K_d]:
         car_angle -= turn_speed
+        wheel_rotate = -15.0  # Ajusta este valor para el ángulo de giro de las ruedas delanteras
+    if not (keys[pygame.K_a] or keys[pygame.K_d]):
+        wheel_rotate = 0.0  # Vuelve las ruedas delanteras a la posición recta si no se gira
 
     for event in pygame.event.get():
         if event.type == pygame.KEYDOWN:

@@ -148,15 +148,13 @@ def displayLlantas_tr():
     # Corrección para dibujar el objeto en plano XZ
     glRotatef(-90.0, 1.0, 0.0, 0.0)
     glTranslatef(0.0, 0.0, 15.0)
-    
-    # Llantas traseras: giran sobre su propio eje X (no afectan el eje del carro)
-    glPushMatrix()
-    # Ajusta la posición local de las llantas traseras si es necesario
-    glRotatef(wheel_angle, 1.0, 0.0, 0.0)
-    
     glScale(10.0,10.0,10.0)
+    # --- Ajuste para rotar las llantas traseras sobre su eje ---
+    # Trasladar al eje de las llantas traseras (ajusta Z si es necesario)
+    glTranslatef(0.0, -2.6, -0.67)  # Ajusta este valor según el centro de las llantas en tu modelo
+    glRotatef(wheel_angle, 1.0, 0.0, 0.0)
+    glTranslatef(0.0, 2.6, 0.67)   # Regresa al origen
     objetos[1].render()
-    glPopMatrix()
     glPopMatrix()
     
 def displayLlantas_ad():
@@ -228,13 +226,13 @@ while not done:
     if keys[pygame.K_s]:
         Player_X += dir_x * move_speed
         Player_Z += dir_z * move_speed
-        wheel_angle -= 5.0  # Incrementa el ángulo de las ruedas al retroceder
+        wheel_angle += 5.0  # Incrementa el ángulo de las ruedas al retroceder
         if wheel_angle <= -360.0:
             wheel_angle += 360.0
     if keys[pygame.K_w]:
         Player_X -= dir_x * move_speed
         Player_Z -= dir_z * move_speed
-        wheel_angle += 5.0  # Incrementa el ángulo de las ruedas al avanzar
+        wheel_angle -= 5.0  # Incrementa el ángulo de las ruedas al avanzar
         if wheel_angle >= 360.0:
             wheel_angle -= 360.0
     if keys[pygame.K_a]:

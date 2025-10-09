@@ -165,7 +165,7 @@ def displayLlantas_ad():
     glPushMatrix()
     # Mover y rotar las llantas según controles
     glTranslatef(Player_X, Player_Y, Player_Z)
-    glRotatef(car_angle, 0.0, 1.0, 0.0)
+    glRotatef(car_angle + wheel_rotate, 0.0, 1.0, 0.0)
     # Corrección para dibujar el objeto en plano XZ
     glRotatef(-90.0, 1.0, 0.0, 0.0)
     glTranslatef(0.0, 0.0, 15.0)
@@ -235,21 +235,21 @@ while not done:
     if keys[pygame.K_s]:
         Player_X += dir_x * move_speed
         Player_Z += dir_z * move_speed
-        wheel_angle += 5.0  # Incrementa el ángulo de las ruedas al retroceder
+        wheel_angle += 10.0  # Incrementa el ángulo de las ruedas al retroceder
         if wheel_angle <= -360.0:
             wheel_angle += 360.0
     if keys[pygame.K_w]:
         Player_X -= dir_x * move_speed
         Player_Z -= dir_z * move_speed
-        wheel_angle -= 5.0  # Incrementa el ángulo de las ruedas al avanzar
+        wheel_angle -= 10.0  # Incrementa el ángulo de las ruedas al avanzar
         if wheel_angle >= 360.0:
             wheel_angle -= 360.0
     if keys[pygame.K_a]:
         car_angle += turn_speed
-        wheel_rotate = 15.0  # Ajusta este valor para el ángulo de giro de las ruedas delanteras
+        wheel_rotate = 5.0  # Ajusta este valor para el ángulo de giro de las ruedas delanteras
     if keys[pygame.K_d]:
         car_angle -= turn_speed
-        wheel_rotate = -15.0  # Ajusta este valor para el ángulo de giro de las ruedas delanteras
+        wheel_rotate = -5.0  # Ajusta este valor para el ángulo de giro de las ruedas delanteras
     if not (keys[pygame.K_a] or keys[pygame.K_d]):
         wheel_rotate = 0.0  # Vuelve las ruedas delanteras a la posición recta si no se gira
 

@@ -166,6 +166,10 @@ def displayLlantas_ad():
     glRotatef(-90.0, 1.0, 0.0, 0.0)
     glTranslatef(0.0, 0.0, 15.0)
     glScale(10.0,10.0,10.0)
+ # Trasladar al eje de las llantas traseras (ajusta Z si es necesario)
+    glTranslatef(0.0, 3.2, -0.68)  # Ajusta este valor según el centro de las llantas en tu modelo
+    glRotatef(wheel_angle, 1.0, 0.0, 0.0)
+    glTranslatef(0.0, -3.2, 0.68)   # Regresa al origen
     objetos[2].render()
     glPopMatrix()
     

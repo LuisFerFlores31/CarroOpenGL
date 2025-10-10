@@ -275,127 +275,22 @@ def displayLlantas_ad():
     glPopMatrix()
 
 #Maquinas de llantas delanteras
-# def displayADder():
-#     glPushMatrix()
-#     glTranslatef(Player_X, Player_Y + 15.0, Player_Z) #15 es la altura del chasis
-#     glRotatef(car_angle, 0.0, 1.0, 0.0)
-#     # Aplicar rotación de dirección ANTES de mover al eje de la llanta
-#     glTranslatef(0.0, 0.0, -15.0)  # Ajuste al nuevo origen
-#     glRotatef(wheel_rotate, 0.0, 1.0, 0.0)  # Giro de dirección en eje Y
-#     glTranslatef(0.0, 0.0, 15.0)  # Ajuste al nuevo origen
-#  #Ajuste para rotar las llantas delanteras sobre su eje
-#     glTranslatef(0.0, -7.2, -32.2)  # Ajuste al nuevo origen
-#     glRotatef(wheel_angle, 1.0, 0.0, 0.0)  # Rotación de la llanta sobre su eje
-#     glTranslatef(0.0, 7.2, 32.2)   # Regresa al origen
-#     glScale(10.0,10.0,10.0)
-#     objetos[3].render()
-#     glPopMatrix()
-
 def displayADder():
     glPushMatrix()
-
-    # --- Parámetros (de tu código) ---
-    # Traslación del jugador / chasis
-    tx_player = Player_X
-    ty_player = Player_Y + 15.0
-    tz_player = Player_Z
-
-    # Desplazamientos intermedios (según tu secuencia)
-    # T_a = (0,0,-15)
-    # después R_wheel_rotate (Y) y luego combinamos:
-    # T_comb1 = T_b + T_c  con T_b=(0,0,15) y T_c=(0,-7.2,-32.2)
-    # T_b + T_c = (0, -7.2, 15 - 32.2) = (0, -7.2, -17.2)
-    t_comb1 = (0.0, -7.2, -17.2)
-    # T_d = (0, 7.2, 32.2)
-    t_d = (0.0, 7.2, 32.2)
-
-    # Escala uniforme
-    s = 10.0
-
-    # Ángulos (convertir a radianes)
-    theta = math.radians(car_angle)      # rotación del carro alrededor de Y
-    phi   = math.radians(wheel_rotate)   # giro de dirección (Y)
-    psi   = math.radians(wheel_angle)    # rotación de la llanta sobre X
-
-    # Precomputados trigonométricos
-    c_th = math.cos(theta);  s_th = math.sin(theta)
-    c_ph = math.cos(phi);    s_ph = math.sin(phi)
-    c_ps = math.cos(psi);    s_ps = math.sin(psi)
-
-    # --- Construir matrices 4x4 (row-major) ---
-    def mat_identity():
-        return [[1.0,0.0,0.0,0.0],
-                [0.0,1.0,0.0,0.0],
-                [0.0,0.0,1.0,0.0],
-                [0.0,0.0,0.0,1.0]]
-
-    def mat_translate(t):
-        tx,ty,tz = t
-        M = mat_identity()
-        M[0][3] = tx
-        M[1][3] = ty
-        M[2][3] = tz
-        return M
-
-    def mat_scale(k):
-        return [[k,0.0,0.0,0.0],
-                [0.0,k,0.0,0.0],
-                [0.0,0.0,k,0.0],
-                [0.0,0.0,0.0,1.0]]
-
-    def mat_rotate_y(c,s):
-        return [[ c, 0.0,  s, 0.0],
-                [0.0, 1.0, 0.0, 0.0],
-                [-s, 0.0,  c, 0.0],
-                [0.0, 0.0, 0.0, 1.0]]
-
-    def mat_rotate_x(c,s):
-        return [[1.0, 0.0, 0.0, 0.0],
-                [0.0,   c,  -s, 0.0],
-                [0.0,   s,   c, 0.0],
-                [0.0, 0.0, 0.0, 1.0]]
-
-    def mat_mult(A,B):
-        # A and B are 4x4 row-major lists -> return C = A * B (row-major)
-        C = [[0.0]*4 for _ in range(4)]
-        for i in range(4):
-            for j in range(4):
-                ssum = 0.0
-                for k in range(4):
-                    ssum += A[i][k] * B[k][j]
-                C[i][j] = ssum
-        return C
-
-    # Matrices según la secuencia original:
-    # M = T_player * R_y(theta) * T_a * R_y(phi) * T_comb1 * R_x(psi) * T_d * S
-    T_player = mat_translate((tx_player, ty_player, tz_player))
-    R_y_theta = mat_rotate_y(c_th, s_th)
-    T_a = mat_translate((0.0, 0.0, -15.0))
-    R_y_phi = mat_rotate_y(c_ph, s_ph)
-    T_comb1 = mat_translate(t_comb1)   # (0, -7.2, -17.2)
-    R_x_psi = mat_rotate_x(c_ps, s_ps)
-    T_d = mat_translate(t_d)           # (0, 7.2, 32.2)
-    S = mat_scale(s)
-
-    # Multiplicaciones (en el orden indicado)
-    M = mat_mult(T_player, mat_mult(R_y_theta,
-            mat_mult(T_a, mat_mult(R_y_phi,
-            mat_mult(T_comb1, mat_mult(R_x_psi,
-            mat_mult(T_d, S)))))))
-
-    # Convertir M (row-major) a lista column-major para glMultMatrixf
-    mm = [
-        M[0][0], M[1][0], M[2][0], M[3][0],
-        M[0][1], M[1][1], M[2][1], M[3][1],
-        M[0][2], M[1][2], M[2][2], M[3][2],
-        M[0][3], M[1][3], M[2][3], M[3][3]
-    ]
-
-    # Aplicar la matriz colapsada y renderizar la llanta
-    glMultMatrixf(mm)
+    glTranslatef(Player_X, Player_Y + 15.0, Player_Z) #15 es la altura del chasis
+    glRotatef(car_angle, 0.0, 1.0, 0.0)
+    # Aplicar rotación de dirección ANTES de mover al eje de la llanta
+    glTranslatef(0.0, 0.0, -15.0)  # Ajuste al nuevo origen
+    glRotatef(wheel_rotate, 0.0, 1.0, 0.0)  # Giro de dirección en eje Y
+    glTranslatef(0.0, 0.0, 15.0)  # Ajuste al nuevo origen
+ #Ajuste para rotar las llantas delanteras sobre su eje
+    glTranslatef(0.0, -7.2, -32.2)  # Ajuste al nuevo origen
+    glRotatef(wheel_angle, 1.0, 0.0, 0.0)  # Rotación de la llanta sobre su eje
+    glTranslatef(0.0, 7.2, 32.2)   # Regresa al origen
+    glScale(10.0,10.0,10.0)
     objetos[3].render()
-
     glPopMatrix()
+
 
 
 def displayADizq():

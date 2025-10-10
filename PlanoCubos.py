@@ -177,21 +177,85 @@ def displayChasis():
     objetos[0].render()
     glPopMatrix() 
     
+    
+    
+# def displayLlantas_tr():
+#     glPushMatrix()
+#     # Mover y rotar el carrito
+#     glTranslatef(Player_X, Player_Y + 15.0, Player_Z)
+#     glRotatef(car_angle, 0.0, 1.0, 0.0)
+#     # Corrección para dibujar el objeto en plano XZ
+#     #glRotatef(-90.0, 1.0, 0.0, 0.0)
+#     #glTranslatef(0.0, 0.0, 15.0)
+#     glScale(10.0,10.0,10.0)
+#     #Ajuste para rotar las llantas traseras sobre su eje
+#     glTranslatef(0.0, -0.66, 2.56) #Ajusta al nuevo punto de referencia
+#     glRotatef(wheel_angle, 1.0, 0.0, 0.0)
+#     glTranslatef(0.0, 0.66, -2.56)# Regresa al origen
+#     objetos[1].render()
+#     glPopMatrix()
+
+
 def displayLlantas_tr():
     glPushMatrix()
-    # Mover y rotar el carrito
-    glTranslatef(Player_X, Player_Y + 15.0, Player_Z)
-    glRotatef(car_angle, 0.0, 1.0, 0.0)
-    # Corrección para dibujar el objeto en plano XZ
-    #glRotatef(-90.0, 1.0, 0.0, 0.0)
-    #glTranslatef(0.0, 0.0, 15.0)
-    glScale(10.0,10.0,10.0)
-    #Ajuste para rotar las llantas traseras sobre su eje
-    glTranslatef(0.0, -0.66, 2.56) #Ajusta al nuevo punto de referencia
-    glRotatef(wheel_angle, 1.0, 0.0, 0.0)
-    glTranslatef(0.0, 0.66, -2.56)# Regresa al origen
+
+    # Pre-cálculos de ángulos en radianes
+    theta = math.radians(car_angle)      # rotación del carro alrededor de Y
+    phi   = math.radians(wheel_angle)    # rotación de la rueda alrededor de X
+
+    c = math.cos(theta)
+    s = math.sin(theta)
+    C = math.cos(phi)
+    S = math.sin(phi)
+
+    # 3x3 = 10 * (R_y(theta) * R_x(phi))
+    # R_y * R_x = [[ c,   s*S,   s*C],
+    #              [ 0,    C,    -S ],
+    #              [-s,  c*S,   c*C ]]
+    m00 = 10.0 * c
+    m10 = 0.0
+    m20 = -10.0 * s
+    m30 = 0.0
+
+    m01 = 10.0 * (s * S)
+    m11 = 10.0 * C
+    m21 = 10.0 * (c * S)
+    m31 = 0.0
+
+    m02 = 10.0 * (s * C)
+    m12 = -10.0 * S
+    m22 = 10.0 * (c * C)
+    m32 = 0.0
+
+    # Cálculo de la traslación resultante (columna 3)
+    # t_pivot = (0, -0.66, 2.56)
+    # t_pivot_inv = (0, 0.66, -2.56)
+    # d = 10 * R_y * t_pivot = [25.6*s, -6.6, 25.6*c]
+    # adicional = 10 * (R_y*R_x) * t_pivot_inv
+    # simplificación realizada en derivación
+    tx_offset = s * (25.6 + 6.6 * S - 25.6 * C)
+    ty_offset = 6.6 * (C - 1.0) + 25.6 * S
+    tz_offset = c * (25.6 + 6.6 * S - 25.6 * C)
+
+    tx = Player_X + tx_offset
+    ty = Player_Y + 15.0 + ty_offset
+    tz = Player_Z + tz_offset
+
+    # Colocar en orden column-major para glMultMatrixf
+    llanta_tr_matrix = [
+        m00, m10, m20, m30,   # columna 0
+        m01, m11, m21, m31,   # columna 1
+        m02, m12, m22, m32,   # columna 2
+        tx,  ty,  tz,  1.0    # columna 3 (traslación)
+    ]
+
+    # Aplicar matriz colapsada y renderizar
+    glMultMatrixf(llanta_tr_matrix)
     objetos[1].render()
+
     glPopMatrix()
+
+
     
 def displayLlantas_ad():
     glPushMatrix()

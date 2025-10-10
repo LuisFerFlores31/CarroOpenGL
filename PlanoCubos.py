@@ -52,7 +52,6 @@ Z_MAX=500
 DimBoard = 200
 
 objetos = []
-
 #Variables para el control del observador
 theta = 0.0
 radius = 300
@@ -113,7 +112,6 @@ def Init():
     #objetos.append(OBJ("Llantas_ad90.obj", swapyz=True)) #Test
     objetos.append(OBJ("Llantas_ad_der.obj", swapyz=True))
     objetos.append(OBJ("Llanta_ad_iz.obj", swapyz=True))
-    #objetos.append(OBJ("Llantas0.obj", swapyz=True)) #Test
 
     for i in range(len(objetos)): 
         objetos[i].generate()
@@ -138,7 +136,6 @@ def lookat():
 #    glScale(10.0,10.0,10.0)
 #    objetos[0].render()
 #    glPopMatrix()
-
 
 def displayChasis():
     glPushMatrix()
@@ -170,7 +167,6 @@ def displayChasis():
     glMultMatrixf(chasis_matrix)
     objetos[0].render()
     glPopMatrix() 
-    
     
     
 # def displayLlantas_tr():
@@ -270,12 +266,12 @@ def displayLlantas_ad():
     c_ws = math.cos(th_ws)
     s_ws = math.sin(th_ws)
 
-    # suma de ángulos car + wheel_rotate (muy usada en la matriz)
+    # suma de ángulos car + wheel_rotate
     th_sum = th_car + th_wr
     c_sum = math.cos(th_sum)   # cos(car + wheel_rotate)
     s_sum = math.sin(th_sum)   # sin(car + wheel_rotate)
 
-    # Componentes de la matriz (column-major, listo para glMultMatrixf)
+    # Componentes de la matriz
     m00 = 10.0 * c_sum
     m10 = 0.0
     m20 = -10.0 * s_sum
@@ -291,7 +287,7 @@ def displayLlantas_ad():
     m22 = 10.0 * c_ws * c_sum
     m32 = 0.0
 
-    # Traslación resultante (Player_Y incluye el +15 del chasis)
+    # Traslación resultante (Player_Y +15)
     # derivada algebraicamente de:
     # T(player) * R_y(car) * T(0,0,-15) * R_y(wheel_rotate) * T(0,0,15)
     # * T(0,-7.2,-32.2) * R_x(wheel_angle) * T(0,7.2,32.2) * S(10)

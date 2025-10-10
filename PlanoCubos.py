@@ -109,12 +109,13 @@ def Init():
     glEnable(GL_COLOR_MATERIAL)
     glShadeModel(GL_SMOOTH)
     #objetos.append(OBJ("Chevrolet_Camaro_SS_Low.obj", swapyz=True))
-    objetos.append(OBJ("Chasis90.obj", swapyz=True))
-    objetos.append(OBJ("Llantas_tr90.obj", swapyz=True))
-    #objetos.append(OBJ("Llantas_tr.obj", swapyz=True))
-    objetos.append(OBJ("Llantas_ad.obj", swapyz=True))
+    objetos.append(OBJ("Chasis90.obj", swapyz=True)) #Necesario
+    objetos.append(OBJ("Llantas_tr90.obj", swapyz=True)) #Necesario
+    #objetos.append(OBJ("Llantas_tr.obj", swapyz=True)) #Antiguas
+    objetos.append(OBJ("Llantas_ad90.obj", swapyz=True)) #Test
     objetos.append(OBJ("Llantas_ad_der.obj", swapyz=True))
     objetos.append(OBJ("Llanta_ad_iz.obj", swapyz=True))
+    objetos.append(OBJ("Llantas0.obj", swapyz=True)) #Test
 
     
     for i in range(len(objetos)): 
@@ -130,16 +131,51 @@ def lookat():
     glLoadIdentity()
     gluLookAt(EYE_X,EYE_Y,EYE_Z,CENTER_X,CENTER_Y,CENTER_Z,UP_X,UP_Y,UP_Z)
     
-#Maquinas de dibujar
+# Dibujado de Chasis con una matriz
+#def displayChasis():
+#    glPushMatrix()
+#    glTranslatef(Player_X, Player_Y + 15.0, Player_Z)
+#    #glTranslatef(0.0, 15.0, 0.0) #Ajusta la altura del chasis
+#    glRotatef(car_angle, 0.0, 1.0, 0.0)
+#    #glRotatef(-90.0, 1.0, 0.0, 0.0) #Rotar el chasis para que quede en plano XZ (Solo necesario para el chasis original)
+#    glScale(10.0,10.0,10.0)
+#    objetos[0].render()
+#    glPopMatrix()
+
+
 def displayChasis():
     glPushMatrix()
-    glTranslatef(Player_X, Player_Y + 15.0, Player_Z)
-    #glTranslatef(0.0, 15.0, 0.0) #Ajusta la altura del chasis
-    glRotatef(car_angle, 0.0, 1.0, 0.0)
-    #glRotatef(-90.0, 1.0, 0.0, 0.0) #Rotar el chasis para que quede en plano XZ (Solo necesario para el chasis original)
-    glScale(10.0,10.0,10.0)
+    # Conversión de ángulo y pre-cálculo de seno/coseno
+    theta_rad = math.radians(car_angle)
+    cos_theta = math.cos(theta_rad)
+    sin_theta = math.sin(theta_rad)
+    # Resultado algebraico de: T · Ry · S
+    chasis_matrix = [
+        10.0 * cos_theta,          
+        0.0,                         
+        -10.0 * sin_theta,          
+        0.0,                         
+        
+        0.0,                         
+        10.0,                        
+        0.0,                         
+        0.0,                         
+        
+        10.0 * sin_theta,           
+        0.0,                         
+        10.0 * cos_theta,           
+        0.0,                        
+        
+        Player_X,                   
+        Player_Y + 15.0,            
+        Player_Z,                  
+        1.0                          
+    ]
+    # Aplicar matriz colapsada
+    glMultMatrixf(chasis_matrix)
+    # Renderizar chasis
     objetos[0].render()
-    glPopMatrix()
+    glPopMatrix() 
     
 def displayLlantas_tr():
     glPushMatrix()
@@ -151,25 +187,24 @@ def displayLlantas_tr():
     #glTranslatef(0.0, 0.0, 15.0)
     glScale(10.0,10.0,10.0)
     #Ajuste para rotar las llantas traseras sobre su eje
-    glTranslatef(0.0, -0.69, 2.58) #Ajusta al nuevo punto de referencia
+    glTranslatef(0.0, -0.66, 2.56) #Ajusta al nuevo punto de referencia
     glRotatef(wheel_angle, 1.0, 0.0, 0.0)
-    glTranslatef(0.0, 0.69, -2.58)# Regresa al origen
+    glTranslatef(0.0, 0.66, -2.56)# Regresa al origen
     objetos[1].render()
     glPopMatrix()
     
 def displayLlantas_ad():
     glPushMatrix()
     # Mover y rotar las llantas según controles
-    glTranslatef(Player_X, Player_Y, Player_Z)
-    glRotatef(car_angle + wheel_rotate, 0.0, 1.0, 0.0)
+    glRotatef(1.0, 1.0, wheel_rotate , 0.0)  #Giro de direccion 
+    glTranslatef(Player_X, Player_Y + 15.0, Player_Z)
+    glRotatef(car_angle, 0.0, 1.0, 0.0)
     # Corrección para dibujar el objeto en plano XZ
-    glRotatef(-90.0, 1.0, 0.0, 0.0)
-    glTranslatef(0.0, 0.0, 15.0)
+    #glRotatef(-90.0, 1.0, 0.0, 0.0)
  # Trasladar al eje de las llantas traseras (ajusta Z si es necesario)
-    glTranslatef(0.0, 3.2, -0.68)  # Ajuste
+    glTranslatef(0.0, -7.2, -32.2)  # Ajuste al nuevo origen
     glRotatef(wheel_angle, 1.0, 0.0, 0.0)
-    glRotatef(1.0, wheel_rotate, 0.0, 0.0)  # Ajusta este valor para girar las llantas delanteras al girar el carro
-    glTranslatef(0.0, -3.2, 0.68)   # Regresa al origen
+    glTranslatef(0.0, 7.2, 32.2)  # Ajuste al nuevo origen
     glScale(10.0,10.0,10.0)
     objetos[2].render()
     glPopMatrix()
@@ -177,29 +212,30 @@ def displayLlantas_ad():
 #Maquinas de llantas delanteras
 def displayADder():
     glPushMatrix()
-    # Mover y rotar las llantas según controles
-    glRotatef(1.0, 1.0, wheel_rotate , 0.0)  #Giro de direccion 
     glTranslatef(Player_X, Player_Y + 15.0, Player_Z) #15 es la altura del chasis
     glRotatef(car_angle, 0.0, 1.0, 0.0)
+    # Aplicar rotación de dirección ANTES de mover al eje de la llanta
+    glRotatef(wheel_rotate, 0.0, 1.0, 0.0)  # Giro de dirección en eje Y
  #Ajuste para rotar las llantas delanteras sobre su eje
-    glTranslatef(0.0, -5.69, -32.2)  # Ajuste al nuevo origen
-    glRotatef(wheel_angle, 1.0, 0.0, 0.0)
-    #glRotatef(1.0, wheel_rotate, 0.0, 0.0)  #Giro de direccion 
-    glTranslatef(0.0, 5.69, 32.2)   # Regresa al origen
+    glTranslatef(0.0, -7.2, -32.2)  # Ajuste al nuevo origen
+    glRotatef(wheel_angle, 1.0, 0.0, 0.0)  # Rotación de la llanta sobre su eje
+    glTranslatef(0.0, 7.2, 32.2)   # Regresa al origen
     glScale(10.0,10.0,10.0)
     objetos[3].render()
     glPopMatrix()
 
 def displayADizq():
     glPushMatrix()
-    # Mover y rotar las llantas según controles
     glTranslatef(Player_X, Player_Y + 15.0, Player_Z) #15 es la altura del chasis
-    glRotatef(car_angle + wheel_rotate, 0.0, 1.0, 0.0)
+    glRotatef(car_angle, 0.0, 1.0, 0.0)
+    # Aplicar rotación de dirección ANTES de mover al eje de la llanta
+    glTranslatef(0.0, 0.0, -15.0)  # Ajuste al nuevo origen
+    glRotatef(wheel_rotate, 0.0, 1.0, 0.0)  # Giro de dirección en eje Y
+    glTranslatef(0.0, 0.0, 15.0)  # Ajuste al nuevo origen
  #Ajuste para rotar las llantas delanteras sobre su eje
-    glTranslatef(0.0, -5.69, -32.2)  # Ajuste al nuevo origen
-    glRotatef(wheel_angle, 1.0, 0.0, 0.0)
-    #glRotatef(1.0, wheel_rotate, 0.0, 0.0)  #Giro de direccion
-    glTranslatef(0.0, 5.69, 32.2)   # Regresa al origen
+    glTranslatef(0.0, -7.2, -32.2)  # Ajuste al nuevo origen
+    glRotatef(wheel_angle, 1.0, 0.0, 0.0)  # Rotación de la llanta sobre su eje
+    glTranslatef(0.0, 7.2, 32.2)   # Regresa al origen
     glScale(10.0,10.0,10.0)
     objetos[4].render()
     glPopMatrix()
@@ -220,7 +256,7 @@ def display():
     displayChasis()
     #Se dibujan las llantas
     displayLlantas_tr()
-   #displayLlantas_ad()
+    #displayLlantas_ad()
 
    #Llantas delateras individuales
     displayADder()

@@ -193,6 +193,7 @@ def displayLlantas_tr():
     objetos[1].render()
     glPopMatrix()
     
+    
 def displayLlantas_ad():
     glPushMatrix()
     # Mover y rotar las llantas según controles
@@ -215,7 +216,9 @@ def displayADder():
     glTranslatef(Player_X, Player_Y + 15.0, Player_Z) #15 es la altura del chasis
     glRotatef(car_angle, 0.0, 1.0, 0.0)
     # Aplicar rotación de dirección ANTES de mover al eje de la llanta
+    glTranslatef(0.0, 0.0, -15.0)  # Ajuste al nuevo origen
     glRotatef(wheel_rotate, 0.0, 1.0, 0.0)  # Giro de dirección en eje Y
+    glTranslatef(0.0, 0.0, 15.0)  # Ajuste al nuevo origen
  #Ajuste para rotar las llantas delanteras sobre su eje
     glTranslatef(0.0, -7.2, -32.2)  # Ajuste al nuevo origen
     glRotatef(wheel_angle, 1.0, 0.0, 0.0)  # Rotación de la llanta sobre su eje
